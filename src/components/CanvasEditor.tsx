@@ -1,25 +1,45 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { floodFill } from '../utils/floodFill';
+import CustomColorPicker from './CustomColorPicker';
 
 interface CanvasEditorProps {
   imageName: string;
   onBack: () => void;
 }
 
-type Tool = 'brush' | 'fill';
+type Tool = 'brush' | 'fill' | 'picker';
+
+const rgbToHex = (r: number, g: number, b: number) => {
+  return '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+};
 
 const COLORS = [
   '#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3',
-  '#000000', '#FFFFFF', '#FF69B4', '#8B4513', '#808080'
+  '#000000', '#FFFFFF', '#FF69B4', '#8B4513', '#808080',
+  '#FFB6C1', '#FFDAB9', '#E6E6FA', '#FFFACD', '#98FB98', '#AFEEEE',
+  '#F08080', '#20B2AA', '#87CEFA', '#778899', '#D2B48C', '#DEB887'
 ];
 
-const CrayonSVG = ({ color }: { color: string }) => (
+const CrayonSVG = ({ color, isMagic }: { color: string, isMagic?: boolean }) => (
   <svg width="120" height="30" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.3))', display: 'block' }}>
+    <defs>
+      <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#ff0000" />
+        <stop offset="20%" stopColor="#ffff00" />
+        <stop offset="40%" stopColor="#00ff00" />
+        <stop offset="60%" stopColor="#00ffff" />
+        <stop offset="80%" stopColor="#0000ff" />
+        <stop offset="100%" stopColor="#ff00ff" />
+      </linearGradient>
+    </defs>
     {/* Body */}
     <rect x="15" y="0" width="85" height="30" fill={color} rx="2" />
     
     {/* Paper Wrapper */}
-    <rect x="25" y="0" width="65" height="30" fill={color} opacity="0.8" />
+    <rect x="25" y="0" width="65" height="30" fill={isMagic ? "url(#rainbow)" : color} opacity={isMagic ? "1" : "0.8"} />
     <path d="M 25 0 Q 30 15 25 30" stroke="rgba(0,0,0,0.2)" strokeWidth="2" fill="none" />
     <path d="M 90 0 Q 85 15 90 30" stroke="rgba(0,0,0,0.2)" strokeWidth="2" fill="none" />
     
@@ -42,9 +62,14 @@ const CrayonSVG = ({ color }: { color: string }) => (
 const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
   const colorCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
+  const customColorInputRef = useRef<HTMLInputElement>(null);
   
   const [tool, setTool] = useState<Tool>('fill');
+  const [brushSize, setBrushSize] = useState<number>(20);
   const [color, setColor] = useState<string>('#FF0000');
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [customHue, setCustomHue] = useState(0);
+  const [customLightness, setCustomLightness] = useState(50);
   const [isDrawing, setIsDrawing] = useState(false);
   
   const [history, setHistory] = useState<ImageData[]>([]);
@@ -193,6 +218,16 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
 
     const { x, y } = getCoordinates(e);
 
+    if (tool === 'picker') {
+      const pixelData = colorCtx.getImageData(x, y, 1, 1).data;
+      if (pixelData[3] > 0) {
+         const hex = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
+         setColor(hex.toUpperCase());
+         setTool('fill');
+      }
+      return;
+    }
+
     if (tool === 'fill') {
       const filled = floodFill(colorCtx, outlineCtx, x, y, color, colorCanvas.width, colorCanvas.height, bgMaskRef.current);
       if (filled) {
@@ -206,7 +241,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
     colorCtx.moveTo(x, y);
     
     colorCtx.strokeStyle = color;
-    colorCtx.lineWidth = 20;
+    colorCtx.lineWidth = brushSize;
     colorCtx.lineCap = 'round';
     colorCtx.lineJoin = 'round';
   };
@@ -247,6 +282,14 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
               <CrayonSVG color={c} />
             </div>
           ))}
+          
+          {/* Custom Magic Crayon */}
+          <div 
+            className={`pencil ${!COLORS.includes(color) ? 'active' : ''}`}
+            onClick={() => setShowColorPicker(true)}
+          >
+            <CrayonSVG color={!COLORS.includes(color) ? color : 'url(#rainbow)'} isMagic={true} />
+          </div>
         </div>
 
         {/* Center: The Drawing Canvas */}
@@ -278,9 +321,30 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
              <span style={{color: 'red', fontWeight: 'bold', fontSize: '36px', WebkitTextStroke: '1px black'}}>✖</span>
            </button>
            
-           <div className="tool-group">
-             <button className={`action-btn ${tool === 'fill' ? 'active' : ''}`} onClick={() => setTool(tool === 'fill' ? 'brush' : 'fill')}>
-               <span style={{color: 'blue', fontWeight: 'bold', fontSize: '32px', WebkitTextStroke: '1px black'}}>{tool === 'fill' ? '🪣' : '🖌️'}</span>
+           <div className="tool-group" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+             <div style={{ position: 'relative' }}>
+               <button className={`action-btn ${tool === 'brush' ? 'active' : ''}`} onClick={() => setTool('brush')}>
+                 <span style={{color: 'blue', fontWeight: 'bold', fontSize: '32px', WebkitTextStroke: '1px black'}}>🖌️</span>
+               </button>
+               {tool === 'brush' && (
+                 <div className="size-group" style={{ position: 'absolute', right: '100%', top: '50%', transform: 'translateY(-50%)', marginRight: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                   <button className={`action-btn ${brushSize === 40 ? 'active' : ''}`} onClick={() => setBrushSize(40)} title="Large Brush">
+                     <span style={{color: '#555', fontSize: '36px'}}>●</span>
+                   </button>
+                   <button className={`action-btn ${brushSize === 20 ? 'active' : ''}`} onClick={() => setBrushSize(20)} title="Medium Brush">
+                     <span style={{color: '#555', fontSize: '24px'}}>●</span>
+                   </button>
+                   <button className={`action-btn ${brushSize === 10 ? 'active' : ''}`} onClick={() => setBrushSize(10)} title="Small Brush">
+                     <span style={{color: '#555', fontSize: '16px'}}>●</span>
+                   </button>
+                 </div>
+               )}
+             </div>
+             <button className={`action-btn ${tool === 'fill' ? 'active' : ''}`} onClick={() => setTool('fill')}>
+               <span style={{color: 'blue', fontWeight: 'bold', fontSize: '32px', WebkitTextStroke: '1px black'}}>🪣</span>
+             </button>
+             <button className={`action-btn ${tool === 'picker' ? 'active' : ''}`} onClick={() => setTool('picker')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px' }}>
+               <img src="/color_picker.png" alt="Color Picker" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
              </button>
            </div>
            
@@ -297,6 +361,20 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
         </div>
 
       </div>
+      {showColorPicker && (
+        <CustomColorPicker 
+          initialColor={color}
+          initialHue={customHue}
+          initialLightness={customLightness}
+          onSelect={(newColor, h, l) => {
+            setColor(newColor);
+            setCustomHue(h);
+            setCustomLightness(l);
+            setShowColorPicker(false);
+          }}
+          onClose={() => setShowColorPicker(false)}
+        />
+      )}
     </div>
   );
 };
