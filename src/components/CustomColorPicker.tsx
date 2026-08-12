@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../App.css'; 
 
 interface CustomColorPickerProps {
-  initialColor: string;
+  initialColor?: string;
   initialHue: number;
   initialLightness: number;
   onSelect: (color: string, h: number, l: number) => void;
@@ -20,7 +20,7 @@ const hslToHex = (h: number, s: number, l: number) => {
   return `#${f(0)}${f(8)}${f(4)}`;
 };
 
-const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialColor, initialHue, initialLightness, onSelect, onClose }) => {
+const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initialLightness, onSelect, onClose }) => {
   const [hue, setHue] = useState(initialHue);
   const [lightness, setLightness] = useState(initialLightness);
   

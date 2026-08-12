@@ -62,7 +62,6 @@ const CrayonSVG = ({ color, isMagic }: { color: string, isMagic?: boolean }) => 
 const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
   const colorCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
-  const customColorInputRef = useRef<HTMLInputElement>(null);
   
   const [tool, setTool] = useState<Tool>('fill');
   const [brushSize, setBrushSize] = useState<number>(20);
