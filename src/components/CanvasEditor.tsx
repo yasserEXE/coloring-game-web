@@ -272,6 +272,14 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
         
         {/* Left Side: Color Pencils */}
         <div className="pencil-sidebar">
+          {/* Custom Magic Crayon */}
+          <div 
+            className={`pencil ${!COLORS.includes(color) ? 'active' : ''}`}
+            onClick={() => setShowColorPicker(true)}
+          >
+            <CrayonSVG color={!COLORS.includes(color) ? color : 'url(#rainbow)'} isMagic={true} />
+          </div>
+
           {COLORS.map(c => (
             <div 
               key={c}
@@ -281,14 +289,6 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({ imageName, onBack }) => {
               <CrayonSVG color={c} />
             </div>
           ))}
-          
-          {/* Custom Magic Crayon */}
-          <div 
-            className={`pencil ${!COLORS.includes(color) ? 'active' : ''}`}
-            onClick={() => setShowColorPicker(true)}
-          >
-            <CrayonSVG color={!COLORS.includes(color) ? color : 'url(#rainbow)'} isMagic={true} />
-          </div>
         </div>
 
         {/* Center: The Drawing Canvas */}

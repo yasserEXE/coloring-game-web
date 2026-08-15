@@ -29,12 +29,13 @@ const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initi
   return (
     <div className="color-picker-overlay" onClick={onClose}>
       <div className="color-picker-modal" onClick={e => e.stopPropagation()}>
-        <h2 style={{ margin: '0 0 20px 0', color: '#333', textAlign: 'center', fontFamily: 'Comic Sans MS, sans-serif' }}>
-          Make a Magic Color! 🌈
-        </h2>
-        
+        {/* Title Header */}
+        <div className="picker-title-wrapper">
+          <h2 className="picker-title">اختر لونك المفضل</h2>
+        </div>
+
         {/* Preview Bubble */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '18px', marginTop: '5px' }}>
           <div 
             style={{ 
               width: '100px', 
@@ -48,8 +49,7 @@ const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initi
         </div>
 
         {/* Hue Slider */}
-        <div className="slider-container">
-          <label>Pick a Color!</label>
+        <div className="slider-container" style={{ marginBottom: '15px' }}>
           <input 
             type="range" 
             min="0" max="360" 
@@ -60,8 +60,7 @@ const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initi
         </div>
 
         {/* Lightness Slider */}
-        <div className="slider-container">
-          <label>Light or Dark?</label>
+        <div className="slider-container" style={{ marginBottom: '15px' }}>
           <input 
             type="range" 
             min="10" max="90" 
@@ -75,12 +74,12 @@ const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initi
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px', gap: '15px' }}>
-          <button className="picker-btn cancel-btn" onClick={onClose}>
-            ✖ Cancel
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '25px', gap: '15px' }}>
+          <button className="picker-btn cancel-btn" onClick={onClose} style={{ fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
+            ✖
           </button>
-          <button className="picker-btn confirm-btn" onClick={() => onSelect(currentColor, hue, lightness)}>
-            ✔ Let's Paint!
+          <button className="picker-btn confirm-btn" onClick={() => onSelect(currentColor, hue, lightness)} style={{ fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
+            ✔
           </button>
         </div>
       </div>

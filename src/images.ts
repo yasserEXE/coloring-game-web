@@ -59,11 +59,9 @@ export const images: ImageItem[] = [
 
   // animals (and others)
   { src: 'baby_tiger.png', category: 'animals' },
-  { src: 'bear.png', category: 'animals' },
   { src: 'bunny.png', category: 'animals' },
   { src: 'cat.png', category: 'animals' },
   { src: 'cat_2.png', category: 'animals' },
-  { src: 'dinsour.png', category: 'animals' },
   { src: 'girrafe.png', category: 'animals' },
   { src: 'girrafes.png', category: 'animals' },
   { src: 'kwala.png', category: 'animals' },
@@ -76,7 +74,6 @@ export const images: ImageItem[] = [
   { src: 'fungi.png', category: 'animals' },
   { src: '1.png', category: 'animals' },
   { src: '2.png', category: 'animals' },
-  { src: 'ar_animal_1.png', category: 'animals' },
   { src: 'ar_animal_2.png', category: 'animals' },
   { src: 'ar_animal_3.png', category: 'animals' },
   { src: 'ar_animal_4.png', category: 'animals' },
