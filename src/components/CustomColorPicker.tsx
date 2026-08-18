@@ -35,38 +35,36 @@ const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initi
         </div>
 
         {/* Preview Bubble */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '18px', marginTop: '5px' }}>
+        <div className="picker-preview-container">
           <div 
+            className="picker-preview-bubble"
             style={{ 
-              width: '100px', 
-              height: '100px', 
-              borderRadius: '50%', 
-              backgroundColor: currentColor,
-              border: '4px solid white',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+              backgroundColor: currentColor
             }} 
           />
         </div>
 
         {/* Hue Slider */}
-        <div className="slider-container" style={{ marginBottom: '15px' }}>
+        <div className="slider-container">
           <input 
             type="range" 
             min="0" max="360" 
             value={hue} 
             onChange={(e) => setHue(Number(e.target.value))}
             className="hue-slider styled-slider"
+            aria-label="Hue Slider"
           />
         </div>
 
         {/* Lightness Slider */}
-        <div className="slider-container" style={{ marginBottom: '15px' }}>
+        <div className="slider-container">
           <input 
             type="range" 
             min="10" max="90" 
             value={lightness} 
             onChange={(e) => setLightness(Number(e.target.value))}
             className="lightness-slider styled-slider"
+            aria-label="Lightness Slider"
             style={{ 
               background: `linear-gradient(to right, #000, ${hslToHex(hue, 100, 50)}, #fff)` 
             }}
@@ -74,11 +72,11 @@ const CustomColorPicker: React.FC<CustomColorPickerProps> = ({ initialHue, initi
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '25px', gap: '15px' }}>
-          <button className="picker-btn cancel-btn" onClick={onClose} style={{ fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
+        <div className="picker-actions-container">
+          <button className="picker-btn cancel-btn" onClick={onClose} aria-label="Cancel">
             ✖
           </button>
-          <button className="picker-btn confirm-btn" onClick={() => onSelect(currentColor, hue, lightness)} style={{ fontSize: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
+          <button className="picker-btn confirm-btn" onClick={() => onSelect(currentColor, hue, lightness)} aria-label="Confirm">
             ✔
           </button>
         </div>
